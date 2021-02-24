@@ -8,33 +8,54 @@ new Vue({
     playerHealth: 100,
     monsterHealth: 100,
     gameIsRunning: false,
+    logs: [],
   },
   methods: {
     startGame: function () {
       this.gameIsRunning = true;
       this.playerHealth = 100;
       this.monsterHealth = 100;
+      this.logs=[]
     },
     attack: function () {
-      this.monsterHealth -= this.calculateDamage(3, 10);
+      var damage = this.calculateDamage(3, 10);
+      this.monsterHealth -= damage;
       if (this.checkWin()) {
         return;
       }
 
+
+      this.logs.unshift({
+        isPlayer: true,
+        text: `Player hits monster ${damage}`,
+      });
+      this.monsterAttacks()
       this.playerHealth -= this.calculateDamage(2, 8);
       this.checkWin();
     },
     specialAttack: function () {
-      this.monsterHealth -= this.calculateDamage(10, 20);
+        var damage = this.calculateDamage(10, 20)
+      this.monsterHealth -= damage;
       if (this.checkWin()) {
         return;
       }
+      this.logs.unshift({
+        isPlayer: true,
+        text: `Player hits monster ${damage}`,
+      });
+      
 
       this.monsterAttacks();
     },
     monsterAttacks: function () {
-      this.playerHealth -= this.calculateDamage(5, 12);
+      var damage = this.calculateDamage(5, 12);
+      this.playerHealth -= damage;
+      
       this.checkWin();
+      this.logs.unshift({
+        isPlayer: false,
+        text: `Monster hit player for ${damage}`,
+      });
     },
     calculateDamage: function (min, max) {
       return Math.max(Math.floor(Math.random() * max) + 1, min);
@@ -60,25 +81,23 @@ new Vue({
       }
       return false;
     },
-    heal : function()
-    {
-        if(this.playerHealth<=90)
-        {
-            this.playerHealth += 10
-        }
-        else{
-            this.playerHealth=100
-        }
-        this.monsterAttacks()
-
+    heal: function () {
+      if (this.playerHealth <= 90) {
+        this.playerHealth += 10;
+      } else {
+        this.playerHealth = 100;
+      }
+      this.logs.unshift({
+          isPlayer : true,
+          text  : `Player heals for 10`
+      })
+      this.monsterAttacks();
     },
-    giveUp : function()
-    {
-        this.playerHealth = 0
-        if(this.checkWin())
-        {
-            return
-        }
-    }
+    giveUp: function () {
+      this.playerHealth = 0;
+      if (this.checkWin()) {
+        return;
+      }
+    },
   },
 });
